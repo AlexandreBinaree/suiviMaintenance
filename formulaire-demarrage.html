@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brigade de Vero - Démarrer une intervention</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .logo {
+            width: 200px;
+            margin-bottom: 30px;
+        }
+        .form-container {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .selector-container {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .selector-flex {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .selector-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        select {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 300px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-top: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .radio-option {
+            display: flex;
+            align-items: center;
+        }
+        .radio-option input {
+            margin-right: 5px;
+        }
+        input[type="number"] {
+            padding: 10px;
+            width: 100%;
+            max-width: 150px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 15px 25px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .hidden {
+            display: none;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 80%;
+            width: 400px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .modal-buttons button {
+            padding: 10px 15px;
+            margin: 0 10px;
+        }
+        .modal-buttons button.cancel {
+            background-color: #dc3545;
+        }
+        .modal-buttons button.cancel:hover {
+            background-color: #bd2130;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #0056b3;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        @media (min-width: 768px) {
+            .selector-flex {
+                flex-direction: row;
+                justify-content: center;
+            }
+            .selector-item {
+                flex: 1;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <img src="https://labrigadedevero.com/wp-content/uploads/2021/12/00-Logo-vecto.svg" alt="Logo Brigade de Vero" class="logo">
+    
+    <!-- Sélecteurs de machine et technicien -->
+    <div class="selector-container">
+        <div class="selector-flex">
+            <div class="selector-item">
+                <label for="machine-select">Machine :</label>
+                <select id="machine-select">
+                    <option value="">-- Choisir une machine --</option>
+                    <option value="Machine_1">Machine 1</option>
+                    <option value="Machine_2">Machine 2</option>
+                    <option value="Machine_3">Machine 3</option>
+                    <option value="Machine_4">Machine 4</option>
+                    <option value="Machine_5">Machine 5</option>
+                </select>
+            </div>
+            
+            <div class="selector-item">
+                <label for="technicien-select">Technicien :</label>
+                <select id="technicien-select">
+                    <option value="">-- Choisir un technicien --</option>
+                    <option value="Jean Dupont">Jean Dupont</option>
+                    <option value="Marie Martin">Marie Martin</option>
+                    <option value="Pierre Bernard">Pierre Bernard</option>
+                    <option value="Sophie Petit">Sophie Petit</option>
+                    <option value="Thomas Durand">Thomas Durand</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-container">
+        <h2>Démarrer une intervention</h2>
+        
+        <div class="form-group">
+            <label for="production-bloquee">La production est-elle bloquée ?</label>
+            <div class="radio-group">
+                <div class="radio-option">
+                    <input type="radio" id="production-oui" name="production-bloquee" value="oui" onchange="toggleTempsBloque(true)">
+                    <label for="production-oui">Oui</label>
+                </div>
+                <div class="radio-option">
+                    <input type="radio" id="production-non" name="production-bloquee" value="non" onchange="toggleTempsBloque(false)" checked>
+                    <label for="production-non">Non</label>
+                </div>
+            </div>
+        </div>
+        
+        <div id="temps-bloque-container" class="form-group hidden">
+            <label for="temps-bloque">Depuis combien de temps (en minutes) ?</label>
+            <input type="number" id="temps-bloque" min="1" value="5">
+        </div>
+        
+        <button id="demarrer-btn" onclick="confirmerDemarrage()">Démarrer l'intervention</button>
+    </div>
+    
+    <a href="https://alexandrebinaree.github.io/suiviMaintenance" class="back-link">← Retour à l'accueil</a>
+    
+    <!-- Modal de confirmation -->
+    <div id="modal-confirmation" class="modal-overlay hidden">
+        <div class="modal">
+            <h3>Confirmation</h3>
+            <p id="confirmation-message">Êtes-vous sûr de vouloir démarrer cette intervention ?</p>
+            <div class="modal-buttons">
+                <button class="cancel" onclick="annulerDemarrage()">Annuler</button>
+                <button onclick="demarrerIntervention()">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Récupérer le paramètre machine de l'URL
+        function getParameterByName(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+        
+        // Afficher/masquer le champ de temps de blocage
+        function toggleTempsBloque(show) {
+            const container = document.getElementById('temps-bloque-container');
+            container.classList.toggle('hidden', !show);
+        }
+        
+        // Afficher la modal de confirmation
+        function confirmerDemarrage() {
+            const machineSelect = document.getElementById('machine-select');
+            const technicienSelect = document.getElementById('technicien-select');
+            const selectedMachine = machineSelect.value;
+            const selectedTechnicien = technicienSelect.value;
+            
+            if (!selectedMachine) {
+                alert('Veuillez sélectionner une machine');
+                return;
+            }
+            
+            if (!selectedTechnicien) {
+                alert('Veuillez sélectionner un technicien');
+                return;
+            }
+            
+            const productionBloquee = document.querySelector('input[name="production-bloquee"]:checked').value;
+            const messageConfirmation = `Êtes-vous sûr de vouloir démarrer cette intervention sur ${selectedMachine} par ${selectedTechnicien} ?` + 
+                                       (productionBloquee === 'oui' ? ' La production est signalée comme bloquée.' : '');
+            
+            document.getElementById('confirmation-message').textContent = messageConfirmation;
+            document.getElementById('modal-confirmation').classList.remove('hidden');
+        }
+        
+        // Fermer la modal de confirmation
+        function annulerDemarrage() {
+            document.getElementById('modal-confirmation').classList.add('hidden');
+        }
+        
+        // Envoyer les données et rediriger
+        function demarrerIntervention() {
+            const machineSelect = document.getElementById('machine-select');
+            const technicienSelect = document.getElementById('technicien-select');
+            const selectedMachine = machineSelect.value;
+            const selectedTechnicien = technicienSelect.value;
+            const productionBloquee = document.querySelector('input[name="production-bloquee"]:checked').value;
+            const tempsBloque = productionBloquee === 'oui' ? document.getElementById('temps-bloque').value : 0;
+            
+            // Sauvegarder le technicien sélectionné dans localStorage pour les prochaines fois
+            localStorage.setItem('technicienID', selectedTechnicien);
+            localStorage.setItem('technicienDate', new Date().toISOString());
+            
+            // Créer un objet avec les données à envoyer
+            const donnees = {
+                machine: selectedMachine,
+                technicien: selectedTechnicien,
+                production_bloquee: productionBloquee,
+                temps_bloque: tempsBloque,
+                action: 'demarrage',
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Données d\'intervention:', donnees);
+            
+            // Ici, vous pouvez ajouter le code pour envoyer les données à votre serveur
+            // Par exemple avec fetch:
+            /*
+            fetch('https://votre-api.com/demarrer-intervention', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(donnees)
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Rediriger vers la page d'accueil après succès
+                    window.location.href = 'https://alexandrebinaree.github.io/suiviMaintenance';
+                } else {
+                    alert('Erreur lors du démarrage de l\'intervention');
+                }
+            })
+            .catch(error => {
+                alert('Erreur de connexion: ' + error.message);
+                console.error('Erreur:', error);
+            });
+            */
+            
+            // Pour la démonstration, nous allons simplement rediriger après un court délai
+            setTimeout(() => {
+                alert('Intervention démarrée avec succès !');
+                window.location.href = 'https://alexandrebinaree.github.io/suiviMaintenance';
+            }, 1000);
+        }
+        
+        // Initialisation de la page
+        window.onload = function() {
+            // Récupérer le sélecteur de machine et définir sa valeur initiale
+            const machineSelect = document.getElementById('machine-select');
+            const urlMachine = getParameterByName('machine');
+            
+            // Si une machine est spécifiée dans l'URL, la sélectionner dans le dropdown
+            if (urlMachine) {
+                // Vérifier si la machine existe dans les options
+                const options = Array.from(machineSelect.options);
+                const matchingOption = options.find(option => option.value === urlMachine);
+                
+                if (matchingOption) {
+                    machineSelect.value = urlMachine;
+                } else {
+                    // Si la machine n'existe pas dans la liste, l'ajouter
+                    const newOption = document.createElement('option');
+                    newOption.value = urlMachine;
+                    newOption.textContent = urlMachine;
+                    machineSelect.appendChild(newOption);
+                    machineSelect.value = urlMachine;
+                }
+            }
+
+            // Mise à jour de l'URL lorsque la sélection de machine change
+            machineSelect.addEventListener('change', function() {
+                if (this.value) {
+                    // Mettre à jour l'URL sans recharger la page
+                    const url = new URL(window.location);
+                    url.searchParams.set('machine', this.value);
+                    window.history.pushState({}, '', url);
+                } else {
+                    // Si aucune machine n'est sélectionnée, supprimer le paramètre de l'URL
+                    const url = new URL(window.location);
+                    url.searchParams.delete('machine');
+                    window.history.pushState({}, '', url);
+                }
+            });
+            
+            // Pré-sélectionner le technicien si disponible dans localStorage
+            const technicienSelect = document.getElementById('technicien-select');
+            const savedTechnicien = localStorage.getItem('technicienID');
+            
+            if (savedTechnicien) {
+                // Vérifier si le technicien existe dans les options
+                const options = Array.from(technicienSelect.options);
+                const matchingOption = options.find(option => option.value === savedTechnicien);
+                
+                if (matchingOption) {
+                    technicienSelect.value = savedTechnicien;
+                } else {
+                    // Si le technicien n'existe pas dans la liste, l'ajouter
+                    const newOption = document.createElement('option');
+                    newOption.value = savedTechnicien;
+                    newOption.textContent = savedTechnicien;
+                    technicienSelect.appendChild(newOption);
+                    technicienSelect.value = savedTechnicien;
+                }
+            }
+        };
+    </script>
+</body>
+</html>
