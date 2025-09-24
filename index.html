@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brigade de Vero - Interface d'intervention</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .logo {
+            width: 200px;
+            margin-bottom: 30px;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        button {
+            padding: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            color: white;
+            border: none;
+            flex: 1;
+            min-height: 80px;
+            min-width: 80px;
+            border-radius: 0;
+            transition: background-color 0.3s, transform 0.1s;
+            text-align: center;
+            font-weight: bold;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        #demander {
+            background-color: #0056b3;
+        }
+        #demander:hover {
+            background-color: #003d82;
+        }
+        #demarrer {
+            background-color: #28a745;
+        }
+        #demarrer:hover {
+            background-color: #1f8838;
+        }
+        #terminer {
+            background-color: #dc3545;
+        }
+        #terminer:hover {
+            background-color: #bd2130;
+        }
+        .machine-selector {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        select {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 300px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .button-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <img src="https://labrigadedevero.com/wp-content/uploads/2021/12/00-Logo-vecto.svg" alt="Logo Brigade de Vero" class="logo">
+    
+    <div class="machine-selector">
+        <label for="machine-select">Sélectionnez une machine :</label>
+        <select id="machine-select">
+            <option value="">-- Choisir une machine --</option>
+            <option value="Machine_1">Machine 1</option>
+            <option value="Machine_2">Machine 2</option>
+            <option value="Machine_3">Machine 3</option>
+            <option value="Machine_4">Machine 4</option>
+            <option value="Machine_5">Machine 5</option>
+            <!-- Ajoutez d'autres options selon vos besoins -->
+        </select>
+    </div>
+    
+    <div class="button-container">
+        <button id="demander">Demander une intervention</button>
+        <button id="demarrer">Démarrer une intervention</button>
+        <button id="terminer">Terminer une intervention</button>
+    </div>
+
+    <script>
+        // Récupérer le paramètre machine de l'URL
+        function getParameterByName(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Récupérer le sélecteur et définir sa valeur initiale
+        const machineSelect = document.getElementById('machine-select');
+        const urlMachine = getParameterByName('machine');
+        
+        // Si une machine est spécifiée dans l'URL, la sélectionner dans le dropdown
+        if (urlMachine) {
+            // Vérifier si la machine existe dans les options
+            const options = Array.from(machineSelect.options);
+            const matchingOption = options.find(option => option.value === urlMachine);
+            
+            if (matchingOption) {
+                machineSelect.value = urlMachine;
+            } else {
+                // Si la machine n'existe pas dans la liste, l'ajouter
+                const newOption = document.createElement('option');
+                newOption.value = urlMachine;
+                newOption.textContent = urlMachine;
+                machineSelect.appendChild(newOption);
+                machineSelect.value = urlMachine;
+            }
+        }
+
+        // Mise à jour de l'URL lorsque la sélection change
+        machineSelect.addEventListener('change', function() {
+            if (this.value) {
+                // Mettre à jour l'URL sans recharger la page
+                const url = new URL(window.location);
+                url.searchParams.set('machine', this.value);
+                window.history.pushState({}, '', url);
+            } else {
+                // Si aucune machine n'est sélectionnée, supprimer le paramètre de l'URL
+                const url = new URL(window.location);
+                url.searchParams.delete('machine');
+                window.history.pushState({}, '', url);
+            }
+        });
+
+        // Gestion du bouton "Demander une intervention"
+        document.getElementById('demander').addEventListener('click', function() {
+            const selectedMachine = machineSelect.value;
+            
+            if (!selectedMachine) {
+                alert('Veuillez sélectionner une machine');
+                return;
+            }
+            
+            // Créer la requête POST
+            fetch(`https://exemple1.com?machine=${selectedMachine}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    machine: selectedMachine,
+                    action: 'demande'
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Demande d\'intervention envoyée avec succès pour ' + selectedMachine);
+                } else {
+                    alert('Erreur lors de l\'envoi de la demande');
+                }
+            })
+            .catch(error => {
+                alert('Erreur de connexion: ' + error.message);
+                console.error('Erreur:', error);
+            });
+        });
+
+        // Gestion des autres boutons (redirection vers les formulaires correspondants)
+        document.getElementById('demarrer').addEventListener('click', function() {
+            const selectedMachine = machineSelect.value;
+            
+            if (!selectedMachine) {
+                alert('Veuillez sélectionner une machine');
+                return;
+            }
+            window.location.href = `formulaire-demarrage.html?machine=${selectedMachine}`;
+        });
+
+        document.getElementById('terminer').addEventListener('click', function() {
+            const selectedMachine = machineSelect.value;
+            
+            if (!selectedMachine) {
+                alert('Veuillez sélectionner une machine');
+                return;
+            }
+            window.location.href = `formulaire-fin.html?machine=${selectedMachine}`;
+        });
+    </script>
+</body>
+</html>
